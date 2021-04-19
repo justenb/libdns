@@ -10,7 +10,7 @@ import (
 
 // Provider implements the libdns interface for namedotcom
 type Provider struct {
-	Client
+	nameClient
 	APIToken string `json:"api_token,omitempty"`
 	User     string `json:"user,omitempty"`
 	APIUrl   string `json:"api_url,omitempty"`

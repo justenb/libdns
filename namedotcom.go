@@ -17,7 +17,7 @@ type (
 		Server string `json:"server,omitempty"`
 		User   string `json:"user,omitempty"`
 		Token  string `json:"token,omitempty"`
-		Client *http.Client
+		client *http.Client
 	}
 
 	// listRecordsResponse contains the response for the ListRecords function.
@@ -75,7 +75,7 @@ func (n *nameDotCom) doRequest(ctx context.Context, method, endpoint string, pos
 
 	req.SetBasicAuth(n.User, n.Token)
 
-	resp, err := n.Client.Do(req)
+	resp, err := n.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -84,16 +84,6 @@ func (n *nameDotCom) doRequest(ctx context.Context, method, endpoint string, pos
 	}
 
 	return resp.Body, nil
-}
-
-// NewNameDotComClient returns a new name.com client struct
-func NewNameDotComClient(token, user, apiUrl string) *nameDotCom {
-	return &nameDotCom{
-		Server: apiUrl,
-		User:   user,
-		Token:  token,
-		Client: &http.Client{Timeout: 10 * time.Second},
-	}
 }
 
 // fromLibDNSRecord maps a name.com record from a libdns record
@@ -119,4 +109,9 @@ func (n *nameDotComRecord) toLibDNSRecord() libdns.Record {
 		Value: n.Answer,
 		TTL:   time.Duration(n.TTL) * time.Second,
 	}
+}
+
+// NewNameDotComClient returns a new name.com client struct
+func NewNameDotComClient(token, user, apiUrl string) *nameDotCom {
+	return &nameDotCom{apiUrl, user, token, &http.Client{Timeout: 10 * time.Second}}
 }

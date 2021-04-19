@@ -10,17 +10,14 @@ import (
 	"sync"
 )
 
-type Client struct {
+// nameClient represents the namedotcom client access
+type nameClient struct {
 	client *nameDotCom
 	mutex  sync.Mutex
 }
 
-// getClient assigns the namedotcom client to the provider
-func (p *Provider) getClient() error {
-	if p.client == nil {
-		p.client = NewNameDotComClient(p.APIToken, p.User, p.APIUrl)
-	}
-	return nil
+func (p *Provider) getClient() {
+	p.client = NewNameDotComClient(p.APIToken, p.User, p.APIUrl)
 }
 
 // listAllRecords returns all records for a zone
@@ -28,7 +25,7 @@ func (p *Provider) listAllRecords(ctx context.Context, zone string) ([]libdns.Re
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
-	_ = p.getClient()
+	p.getClient()
 
 	var (
 		records []libdns.Record
@@ -68,7 +65,7 @@ func (p *Provider) deleteRecord(ctx context.Context, zone string, record libdns.
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
-	_ = p.getClient()
+	p.getClient()
 
 	var (
 		deletedRecord nameDotComRecord
@@ -102,7 +99,7 @@ func (p *Provider) upsertRecord(ctx context.Context, zone string, record libdns.
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
-	_ = p.getClient()
+	p.getClient()
 
 	var (
 		upsertedRecord nameDotComRecord
